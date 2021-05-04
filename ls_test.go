@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"github.com/facebookgo/ensure"
-	"github.com/gliderlabs/hostctl/providers"
+	"github.com/progrium/hostctl/providers"
 )
 
 func TestListBasic(t *testing.T) {

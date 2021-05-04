@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/gliderlabs/hostctl/providers"
+	"github.com/progrium/hostctl/providers"
 	"github.com/spf13/cobra"
 )
 

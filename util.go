@@ -10,8 +10,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/gliderlabs/hostctl/providers"
 	"github.com/mitchellh/go-homedir"
+	"github.com/progrium/hostctl/providers"
 	"golang.org/x/crypto/ssh/terminal"
 )
 

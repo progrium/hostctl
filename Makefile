@@ -1,22 +1,14 @@
 NAME=hostctl
 ARCH=$(shell uname -m)
-VERSION=0.1.0dev
+VERSION=0.2.0dev
 
-.PHONY: build release docs
 
-build:
-	glu build darwin,linux
+.PHONY: build
+build: local/bin/hostctl
 
+local/bin/hostctl: *.go **/*.go
+	go build -o local/bin/hostctl .
+
+.PHONY: test
 test:
 	go test -v
-
-deps:
-	go get github.com/gliderlabs/glu
-	go get -d .
-
-release:
-	glu release v$(VERSION)
-
-docs:
-	boot2docker ssh "sync; sudo sh -c 'echo 3 > /proc/sys/vm/drop_caches'" || true
-	docker run --rm -it -p 8000:8000 -v $(PWD):/work gliderlabs/pagebuilder mkdocs serve

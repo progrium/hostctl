@@ -1,1 +1,0 @@
-# Contributing Cloud Providers

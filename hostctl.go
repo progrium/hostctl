@@ -1,16 +1,15 @@
 package main
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/MattAitchison/env"
-	"github.com/gliderlabs/pkg/usage"
 	"github.com/spf13/cobra"
 )
 
 var (
-	Version        string
-	versionChecker = usage.NewChecker("hostctl", Version)
+	Version string
 
 	providerName string
 	defaultName  string
@@ -72,6 +71,6 @@ var versionCmd = &cobra.Command{
 	Use:   "version",
 	Short: "Show version",
 	Run: func(cmd *cobra.Command, args []string) {
-		versionChecker.PrintVersion()
+		fmt.Println(Version)
 	},
 }

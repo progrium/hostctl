@@ -1,6 +1,7 @@
 package digitalocean
 
 import (
+	"context"
 	"fmt"
 	"path/filepath"
 	"strconv"
@@ -9,7 +10,7 @@ import (
 
 	"github.com/MattAitchison/env"
 	"github.com/digitalocean/godo"
-	"github.com/gliderlabs/hostctl/providers"
+	"github.com/progrium/hostctl/providers"
 	"golang.org/x/oauth2"
 )
 
@@ -38,7 +39,7 @@ func (p *digitalOceanProvider) Setup() error {
 	tokenSource := oauth2.StaticTokenSource(&oauth2.Token{AccessToken: token})
 	oauthClient := oauth2.NewClient(oauth2.NoContext, tokenSource)
 	p.client = godo.NewClient(oauthClient)
-	_, _, err := p.client.Account.Get()
+	_, _, err := p.client.Account.Get(context.Background())
 	return err
 }
 
@@ -58,7 +59,7 @@ func (p *digitalOceanProvider) Create(host providers.Host) error {
 		}
 		sshKey.ID = id
 	}
-	droplet, _, err := p.client.Droplets.Create(&godo.DropletCreateRequest{
+	droplet, _, err := p.client.Droplets.Create(context.Background(), &godo.DropletCreateRequest{
 		Name:   host.Name,
 		Region: host.Region,
 		Size:   host.Flavor,
@@ -72,7 +73,7 @@ func (p *digitalOceanProvider) Create(host providers.Host) error {
 		return err
 	}
 	for {
-		droplet, _, err = p.client.Droplets.Get(droplet.ID)
+		droplet, _, err = p.client.Droplets.Get(context.Background(), droplet.ID)
 		if droplet != nil && droplet.Status == "active" {
 			return nil
 		}
@@ -84,13 +85,13 @@ func (p *digitalOceanProvider) Create(host providers.Host) error {
 }
 
 func (p *digitalOceanProvider) Destroy(name string) error {
-	droplets, _, err := p.client.Droplets.List(nil)
+	droplets, _, err := p.client.Droplets.List(context.Background(), nil)
 	if err != nil {
 		return err
 	}
 	for i := range droplets {
 		if droplets[i].Name == name {
-			_, err := p.client.Droplets.Delete(droplets[i].ID)
+			_, err := p.client.Droplets.Delete(context.Background(), droplets[i].ID)
 			if err != nil {
 				return err
 			}
@@ -105,7 +106,7 @@ func (p *digitalOceanProvider) Destroy(name string) error {
 }
 
 func (p *digitalOceanProvider) List(pattern string) []providers.Host {
-	droplets, _, err := p.client.Droplets.List(nil)
+	droplets, _, err := p.client.Droplets.List(context.Background(), nil)
 	if err != nil {
 		return nil
 	}
@@ -121,7 +122,7 @@ func (p *digitalOceanProvider) List(pattern string) []providers.Host {
 }
 
 func (p *digitalOceanProvider) Get(name string) *providers.Host {
-	droplets, _, err := p.client.Droplets.List(nil)
+	droplets, _, err := p.client.Droplets.List(context.Background(), nil)
 	if err != nil {
 		return nil
 	}
@@ -130,7 +131,11 @@ func (p *digitalOceanProvider) Get(name string) *providers.Host {
 			var ip string
 			if droplets[i].Networks != nil {
 				if len(droplets[i].Networks.V4) > 0 {
-					ip = droplets[i].Networks.V4[0].IPAddress
+					for _, network := range droplets[i].Networks.V4 {
+						if network.Type == "public" {
+							ip = network.IPAddress
+						}
+					}
 				}
 			}
 			return &providers.Host{

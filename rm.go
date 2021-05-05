@@ -9,11 +9,11 @@ import (
 )
 
 func init() {
-	Hostctl.AddCommand(downCmd)
+	Hostctl.AddCommand(rmCmd)
 }
 
-var downCmd = &cobra.Command{
-	Use:   "down <name> [<name>...]",
+var rmCmd = &cobra.Command{
+	Use:   "rm <name> [<name>...]",
 	Short: "Terminate host",
 	Run: func(cmd *cobra.Command, args []string) {
 		if len(args) < 1 && defaultName == "" {

@@ -7,7 +7,7 @@ import (
 	"github.com/progrium/hostctl/providers"
 )
 
-func TestDownCmd(t *testing.T) {
+func TestRmCmd(t *testing.T) {
 	t.Parallel()
 	provider := new(providers.TestProvider)
 	provider.Create(providers.Host{
@@ -17,7 +17,7 @@ func TestDownCmd(t *testing.T) {
 		Name: "test2",
 	})
 
-	stdout, stderr := testRunCmd(t, "hostctl down test1", 0, provider, nil)
+	stdout, stderr := testRunCmd(t, "hostctl rm test1", 0, provider, nil)
 	ensure.DeepEqual(t, stdout.String(), "")
 	ensure.DeepEqual(t, stderr.String(), "\n")
 
